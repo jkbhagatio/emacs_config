@@ -221,9 +221,9 @@
 
 ;; magit settings
 (use-package emacsql-sqlite-builtin)
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(use-package magit)
+  ;:custom
+  ;(magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 (setq magit-auto-revert-mode t)
 (use-package forge)
 
