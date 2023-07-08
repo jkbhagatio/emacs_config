@@ -28,7 +28,7 @@
 
 ;; Turn on recent file mode
 (recentf-mode 1)
-(global-set-key (kbd "C-c C-f") 'recentf-open-files)
+(global-set-key (kbd "C-c F") 'recentf-open-files)
 
 ;; Enable windmove `shift + <arrow>` keybindings
 (when (fboundp 'windmove-default-keybindings)
@@ -38,18 +38,33 @@
 (global-set-key (kbd "C-x /") 'comment-or-uncomment-region)
 
 ;; Initialize package sources
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
-(setq use-package-always-ensure t)
+;; (require 'package)
+;; (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+;;                          ("org" . "https://orgmode.org/elpa/")
+;;                          ("elpa" . "https://elpa.gnu.org/packages/")))
+;; (package-initialize) 
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
+;; (unless (package-installed-p 'use-package)
+;;   (package-install 'use-package))
+;; (require 'use-package)
+;; (setq use-package-always-ensure t)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)  ; use straight by default with `use-package`
 
+;; Configure completion packages
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
@@ -65,8 +80,8 @@
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
-  :init (ivy-mode 1))
-
+  :config
+  (ivy-mode 1))
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-switch-buffer)
@@ -76,10 +91,32 @@
 	 ("C-r" . counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil))  ; don't start searches with `^`
-
 (use-package ivy-rich
-  :init
+  :config
   (ivy-rich-mode 1))
+(use-package ivy-prescient
+  :after counsel
+  :config
+  (ivy-prescient-mode 1)
+  (setq prescient-filter-method '(literal initialism fuzzy regexp))
+  (prescient-persist-mode 1))
+(use-package company
+  :config
+;  (setq company-global-modes '(not <mode1> <mode2>))
+  (global-company-mode 1)
+  (setq company-minimum-prefix-length 2))
+(use-package company-prescient
+  :after company
+  :config
+  (company-prescient-mode 1)
+  (prescient-persist-mode 1))
+(use-package orderless
+  :config
+  (setq completion-styles '(orderless basic vertico partial-completion))
+  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+  (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight)))
+(use-package consult
+  :bind (("C-<tab>" . consult-buffer)))
 
 (use-package vscode-icon)
 
@@ -208,7 +245,7 @@
   (setq aw-dispatch-always t))
 
 (use-package doom-modeline
-  :ensure t
+  :straight t
   :init (doom-modeline-mode 1))
 
 (use-package doom-themes)
@@ -227,6 +264,7 @@
 (setq magit-auto-revert-mode t)
 (use-package forge)
 
-(use-package command-log-mode)  ; log commands into a buffer: `M-x clm/open-command-log-buffer`
-(clm/open-command-log-buffer)
-(setq global-command-log-mode t)
+(use-package command-log-mode  ; log commands into a buffer
+  :config
+  (clm/open-command-log-buffer))
+
