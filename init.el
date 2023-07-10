@@ -37,6 +37,15 @@
 ;; Toggle commenting
 (global-set-key (kbd "C-x /") 'comment-or-uncomment-region)
 
+;; Set zsh as default shell
+;; (load "c:/Users/jai/fakecygpty/fakecygpty.el")
+;; (require 'fakecygpty)
+;; (fakecygpty-activate)
+(setq shell-command-switch "-c")
+(setq explicit-shell-file-name "c:/Users/jai/cygwin64/bin/zsh.exe")
+; add cygwin binaries to current emacs path
+(setenv "PATH" (concat "c:/Users/jai/cygwin64/bin" path-separator (getenv "PATH")))
+
 ;; Initialize package sources
 ;; (require 'package)
 ;; (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -112,7 +121,7 @@
   (prescient-persist-mode 1))
 (use-package orderless
   :config
-  (setq completion-styles '(orderless basic vertico partial-completion))
+  (setq completion-styles '(orderless basic partial-completion))
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
   (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 (use-package consult

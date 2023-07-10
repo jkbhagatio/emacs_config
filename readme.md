@@ -18,4 +18,5 @@ ___
 2. Move and add the `'app_shortcuts/'` dir to the system path.
 3. Edit the emacs launcher script in `app_shortcuts` as necessary.
 4. Move `.gitconfig`, and `.authinfo` to the location specified by 'HOME' in the emacs launcher script, and move `init.el` to an `.emacs.d/` directory within this 'HOME' location.
-5. Launch emacs from the launcher script: voila.
+5. Carefully look over the `init.el` file and make changes as necessary (e.g. to path variables)
+6. Run the emacs launcher script to start emacs: voila.
