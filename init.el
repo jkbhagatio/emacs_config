@@ -18,34 +18,6 @@
 (save-place-mode 1)             ; turn on save place mode for navigating in place to reopened file
 (column-number-mode 1)          ; add column numbers to mode line    
 
-;; Set a location for customization variables so they don't get set here
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file 'noerror 'nomessage)
-
-;; Update files in buffers when they've been changed outside of Emacs
-(global-auto-revert-mode 1)
-(setq global-auto-revert-non-file-buffers t)
-
-;; Turn on recent file mode
-(recentf-mode 1)
-(global-set-key (kbd "C-c F") 'recentf-open-files)
-
-;; Enable windmove `shift + <arrow>` keybindings
-(when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings))
-
-;; Toggle commenting
-(global-set-key (kbd "C-x /") 'comment-or-uncomment-region)
-
-;; Set zsh as default shell
-;; (load "c:/Users/jai/fakecygpty/fakecygpty.el")
-;; (require 'fakecygpty)
-;; (fakecygpty-activate)
-(setq shell-command-switch "-c")
-(setq explicit-shell-file-name "c:/Users/jai/cygwin64/bin/zsh.exe")
-; add cygwin binaries to current emacs path
-(setenv "PATH" (concat "c:/Users/jai/cygwin64/bin" path-separator (getenv "PATH")))
-
 ;; Initialize package sources
 ;; (require 'package)
 ;; (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -72,6 +44,62 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)  ; use straight by default with `use-package`
+
+;; Set a location for customization variables so they don't get set here
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; Update files in buffers when they've been changed outside of Emacs
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+
+;; File keybindings
+(global-set-key (kbd "C-c f") 'find-file)
+(recentf-mode 1)
+(global-set-key (kbd "C-c F") 'recentf-open-files)
+
+;; Enable windmove `shift + <arrow>` keybindings
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
+;; Toggle commenting
+(global-set-key (kbd "C-x /") 'comment-or-uncomment-region)
+
+;; Set zsh as default shell
+(load "c:/Users/jai/fakecygpty/fakecygpty.el")
+(require 'fakecygpty)
+(fakecygpty-activate)
+(setq shell-command-switch "-c")
+(setq explicit-shell-file-name "c:/Users/jai/cygwin64/bin/zsh.exe")
+; add cygwin binaries to current emacs path
+(setenv "PATH" (concat "c:/Users/jai/cygwin64/bin" path-separator (getenv "PATH")))
+(defun zterm ()
+  "Run term with a specific HOME directory (for zsh)."
+  (interactive)
+  (let ((emacs-home (getenv "HOME"))
+        (system-home "c:/Users/jai")
+	(buffer-name (read-string "Enter buffer name: ")))
+    (setenv "HOME" system-home)
+    (call-interactively 'term)
+    (rename-buffer buffer-name t)
+    (setenv "HOME" emacs-home)))
+;; (use-package eterm-256color
+;;   :hook (term-mode . eterm-256color-mode))
+
+;; Configure eshell
+(setq eshell-hist-ignoredups t)
+(setq eshell-scroll-to-bottom-on-input t)
+(with-eval-after-load 'esh-opt
+  (setq eshell-destroy-buffer-when-process-dies t))
+(with-eval-after-load 'esh-mode
+  (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  (define-key eshell-mode-map (kbd "<home>") 'eshell-bol))
+(add-to-list 'load-path "c:/Users/jai/aweshell")
+(require 'aweshell)
+
+;; Ensure env vars in emacs echo system
+(use-package exec-path-from-shell)
+;(exec-path-from-shell-initialize)
 
 ;; Configure completion packages
 (use-package ivy
